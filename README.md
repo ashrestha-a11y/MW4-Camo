@@ -1,49 +1,28 @@
-# MW4 Camo Command — React
+# MW4 Camo Command — multi-user edition
 
-React + Vite frontend, Vercel serverless storage endpoint, optional Upstash Redis. Single-user tracker with local browser storage as the default. No external assets needed: existing screenshot crops are embedded in `src/model.js`.
+React + Vite frontend, Vercel Functions and Upstash Redis. Each user registers a unique username and password, signs in and gets an independent tracker save. Existing camo assets, rules and backup format are unchanged. Some game data is provisional.
 
-## Run locally
+## Upgrade your existing Vercel project
+1. Export a JSON backup from the previous tracker before updating it. The old shared Redis save is not automatically assigned to any account.
+2. Extract this ZIP and copy the contents of `mw4-react` into the root of your existing Git repository (including `api`, `server`, `src`, `test`, `package.json`, `vercel.json`, and hidden config files). Do not replace the `.git` directory or your local secrets.
+3. In Vercel, keep the Vite preset, build command `npm run build`, output `dist`.
+4. Connect an Upstash Redis database from Vercel Marketplace if you have not already done so. Set `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` in project environment variables. Use a read/write token. `TRACKER_ACCESS_KEY` is no longer used and can be removed. Never expose the Redis token via a `VITE_` variable or Git.
+5. Commit and push to the connected branch. Vercel builds automatically; redeploy if you changed environment variables.
+6. Open your deployed app, create an account, then import your old JSON backup into that account. Each other user creates their own account.
 
-Install Node.js 22+, open this folder in VS Code, then:
+## Local development
+Install Node.js 22+, run `npm install` and `npm test`. Use `npx vercel dev` after linking your Vercel project and setting the Redis variables in a local `.env.local` (use a separate development database). `npm run dev` runs the Vite frontend only, so login will not work without the API. Production uses `npm run build`.
 
-```sh
-npm install
-npm run dev
-```
+## Authentication and storage
+- Username: 3–24 lowercase letters, digits or underscores; usernames are case insensitive. Password: at least 10 characters, at most 256 bytes.
+- Passwords are salted and hashed with Node scrypt; opaque 14-day sessions are stored in Redis and delivered in HttpOnly, SameSite=Lax cookies (Secure on Vercel).
+- Server derives the progress key from the authenticated session, not a client-supplied user ID. A stale tab cannot save to a different signed-in account. Auth POSTs and progress PUTs enforce same origin. Login and registration are rate limited.
+- Progress saves automatically after edits (400ms debounce), with a per-user local recovery copy while a save is pending. Save now forces a save. Sign out flushes pending saves first; if cloud storage fails, retry or export a backup.
+- This is a small personal/community app, not a fully hardened identity platform. No email verification, password recovery, MFA, or account deletion UI yet. Use distinct passwords. Multiple simultaneous editing sessions for the same user use last-write-wins; avoid editing from multiple devices at once. Local recovery copies may remain on a shared computer after a failed save; do not use a shared browser profile for sensitive data.
+- Redis keys are prefixed `mw4:v2:`. Old shared progress remains untouched. Database credentials stay on the server.
 
-Open the URL Vite prints. Local storage works immediately. `npm test` tests progression without dependencies; `npm run build` builds the frontend. The optional cloud API requires Vercel's runtime (use `npx vercel dev` for local API testing after configuring environment variables).
+## Tests
+`npm test` runs progression and authentication tests with an in-memory mock of Redis, including independent account saves and unauthorized access. A real deployment and Redis connection must be verified after setup.
 
-## Deploy to Vercel
-
-1. Extract ZIP, open the extracted `mw4-react` folder. Upload its **contents** to a new GitHub repository, including `src`, `api`, `package.json`, `index.html` and `vercel.json`.
-2. In Vercel, Add New → Project → Import the GitHub repo. Root directory should be the folder containing `package.json`. Framework preset: Vite; build command: `npm run build`; output directory: `dist`. Deploy.
-3. Local saving works as soon as the site loads. For cloud saving, create an Upstash Redis database via Vercel Marketplace or https://console.upstash.com/.
-4. In Vercel project Settings → Environment Variables, set these three server-only variables for Production (and Preview if desired):
-
-| Name | Value |
-| --- | --- |
-| `UPSTASH_REDIS_REST_URL` | Redis REST URL from Upstash |
-| `UPSTASH_REDIS_REST_TOKEN` | Redis read/write REST token |
-| `TRACKER_ACCESS_KEY` | A long, unique random secret of your choosing |
-
-Never prefix these with `VITE_`, commit them to GitHub, or share your access key. Redeploy after setting the variables. If the integration already added the two Redis variables, only add the access key.
-
-5. Open your deployed app, expand **Cloud storage**, enter your `TRACKER_ACCESS_KEY`, and click **Connect cloud**. If a cloud save exists, confirm loading it; if empty, confirm uploading your local progress. Subsequent edits auto-save after a short debounce. Use **Save now** and wait for `Cloud saved ✓` before closing or switching devices. Reconnect on a new browser or after reload to resume cloud saving. The key is held only in memory for the current session.
-
-This is a single private progress record per database, not a multi-user account system. Use one editing session at a time: concurrent sessions can overwrite one another. Cloud failures retain the local save. Back up periodically. No account with Activision is required and no game data is fetched automatically.
-
-## Move existing progress
-
-Open the old HTML tracker, click Export backup, then Import backup on the new React site. Import before connecting to an empty cloud database. If a cloud record already exists, connect first, then import (confirm replacing the loaded record) and click Save now. Local storage is per website/origin, so old file-based progress is not transferred automatically.
-
-## Project structure
-
-- `src/main.jsx`: React components and storage controls
-- `src/model.js`: weapon data, embedded camo/weapon icons, progression rules and state helpers
-- `src/style.css`: responsive styling from previous tracker
-- `api/progress.js`: authenticated GET/PUT endpoint, Redis persistence
-- `test/model.test.js`: core progression regression tests
-
-Existing data from the HTML version is retained, including provisional requirements and illustrative textures. CSG-35 Terminus is confirmed at Prestige Master 44; other Terminus thresholds are provisional. Base caps and acquisition requirements are not newly verified in this conversion. Unknown weapons remain marked unverified. Divergence is a shared unlock tracked separately.
-
-References: https://vercel.com/docs/frameworks/frontend/vite ; https://vercel.com/docs/marketplace-storage ; https://upstash.com/docs/redis/features/restapi
+### Warzone Special camo update (November 25, 2026)
+The game-mode selector defaults to Warzone; Multiplayer and DMZ remain selectable. Special objectives and numeric targets were matched by camo name using the community catalogs at https://codmunity.gg/camo-tracker and its individual MW4 weapon pages, https://mw4.gg/camo-tracker/ and https://livecamotracker.com/mw4/camos/warzone . These are community-reported, not individually publisher-certified. 105 Special targets across 35 weapons are included; JAK 12 and ZLR Talonhawk targets remain unknown and their Warzone Special counters are disabled. Existing save keys, API and other mode criteria remain unchanged; review any previously entered Warzone counts against the updated objective. Completionist targets were not changed in this update. No new environment variables required.
