@@ -55,3 +55,9 @@ Special camo weapon-unlock requirements use individual manual confirmations, ind
 
 ### Independent Special camo progression
 Special challenges require only their individual weapon-unlock confirmation (where applicable), regardless of Military progress. Gold continues to require all eight Military and all three Special camos. No save schema changes.
+
+### Special prerequisite checkbox fix
+Every Special camo now requires manual confirmation, including those with unpublished thresholds. Cronen Osprey In the Weeds uses the screenshot-confirmed 24 unlocks. Existing progress for formerly unguarded challenges is retained and treated as confirmation if nonzero. Military progression remains independent.
+
+### Cronen Osprey threshold update
+In the Weeds: 24; Dark Ichor: 29; Chained: 40, using the agreed cumulative interpretation of user-supplied increments. Existing confirmation flags, challenge counts and save identifiers are unchanged.
