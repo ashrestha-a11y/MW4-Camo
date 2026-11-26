@@ -46,3 +46,9 @@ Each Military camo is now a shared per-weapon checkbox, independent of base and 
 
 ### Simplified weapon view
 The game mode selector, weapon search, and hide-completed controls are removed. Weapon Mastery uses Warzone (mode index 2); other mode data is retained in saves. All weapons in the selected class and all challenges are visible. No storage or environment changes.
+
+### Sequential Military unlocks
+Military camos are manually unlocked in order, independent of weapon level. Removing a Military unlock clears all later Military unlocks for that weapon; older saves with gaps retain only the contiguous unlocked prefix. Special challenge counters are preserved but relocked until prerequisites are met.
+
+### Manual Special prerequisites
+Special camo weapon-unlock requirements use individual manual confirmations, independent of the level counter. All eight Military camos are still required. Unchecking a confirmation locks the challenge without deleting its progress. Older saves prefill confirmations using the previous level-based rule; review them against the game. Threshold numbers are retained from the existing dataset and are not newly verified.
