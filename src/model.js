@@ -517,7 +517,7 @@ function lockReason(w,r){
  if(w==='account'){let i=mastery.indexOf(r);if(stage('harm')<state.goal)return `Unlock Divergence first (${stage('harm')}/${state.goal} Harmonic Break)`;if(i%3&&!done('account',mastery[i-1]))return 'Complete '+mastery[i-1].name+' first';return ''}
  let weapon=weapons.find(x=>x.id===w);if(!weapon)return '';let get=id=>weapon.rows.find(x=>x.id===id),has=id=>done(w,get(id));let count=t=>weapon.rows.filter(x=>x.tier===t&&done(w,x)).length;
  if(r.tier==='Military'){const i=Number(r.id.slice(1));for(let j=0;j<i;j++)if(!has('m'+j))return `Unlock Military ${j+1} first`; }
- if(r.tier==='Special'){let n=count('Military');if(n<8)return `Complete all Military camos (${n}/8)`;if(r.unlock&&!specialConfirmed(w,r))return `Confirm ${r.unlock} weapon unlocks first`;}
+ if(r.tier==='Special'){if(r.unlock&&!specialConfirmed(w,r))return `Confirm ${r.unlock} weapon unlocks first`;}
  if(r.id==='gold'){let n=count('Military'),k=count('Special');if(n<8||k<3)return `Complete Military (${n}/8) and Special (${k}/3)`;}
  if(r.id==='plat'){if(!has('gold'))return 'Unlock Gold on this weapon first';let peers=weapons.filter(x=>x.group===weapon.group),n=peers.filter(x=>done(x.id,x.rows.find(y=>y.id==='gold'))).length;let required=Math.min(peers.length,state.classGoals?.[weapon.group]??peers.length);if(n<required)return `Unlock Gold in ${weapon.group} (${n}/${required})`;}
  if(r.id==='harm'){if(!has('plat'))return 'Unlock Platinum on this weapon first';let n=stage('plat');if(n<state.goal)return `Unlock Platinum on ${state.goal} weapons (${n}/${state.goal})`;}
