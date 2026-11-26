@@ -61,3 +61,6 @@ Every Special camo now requires manual confirmation, including those with unpubl
 
 ### Cronen Osprey threshold update
 In the Weeds: 24; Dark Ichor: 29; Chained: 40, using the agreed cumulative interpretation of user-supplied increments. Existing confirmation flags, challenge counts and save identifiers are unchanged.
+
+## Manual Prestige update
+Base progression counter is hidden. Confirm Prestige after doing it in-game, then track levels 1–250. Legacy level data is retained for migration.
