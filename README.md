@@ -40,3 +40,9 @@ Create and sign in to your own account **before** enabling admin access. In Verc
 The panel supports search, deleting accounts and cloud progress, resetting cloud progress, disabling/reactivating accounts, revoking sessions, and setting a new password. Reset passwords must be securely communicated to the user; no forced password-change or email recovery workflow is included. Account actions rotate the session epoch; prior session records expire normally, but are rejected immediately on subsequent session validation. Older browser recovery copies remain on the device but are no longer automatically loaded after an epoch change. Backups already downloaded cannot be remotely deleted. Only MW4 account and progress keys are modified; never flush the shared database. Avoid simultaneous account administration and user writes; an already in-flight request may finish. The admin API is intended for a small user roster. Preview and production share the configured database unless configured separately.
 
 Run `npm test` for mocked Redis regression tests. Live deployment and production build require verification.
+
+### Manual Military camos
+Each Military camo is now a shared per-weapon checkbox, independent of base and Prestige levels. Existing saves without the militaryManual marker are migrated once using the previous displayed completion rules; review these inferred checkboxes against the game. New saves start unchecked. Special camo prerequisites remain unchanged (all eight Military camos plus the existing level requirement). Changes use the existing autosave, backup and Redis progress APIs.
+
+### Simplified weapon view
+The game mode selector, weapon search, and hide-completed controls are removed. Weapon Mastery uses Warzone (mode index 2); other mode data is retained in saves. All weapons in the selected class and all challenges are visible. No storage or environment changes.
